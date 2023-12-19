@@ -1,0 +1,18 @@
+# Docker
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- python_api_final
+
+pool:
+ vmImage: 'ubuntu-latest'
+
+steps:
+- script: |
+   az login --service-principal -u $(appid) -p $(secret) --tenant $(tenent)
+   cd FDB-storage-app-updated
+   az acr build --image codesc:v$(Build.BuildId) --registry acrscnonprod --file dockerfile .
+   az extension add --name containerapp --upgrade
+   az containerapp update --name conappscnonprod --resource-group rg-20060000-storageconditions-NonProd --image acrscnonprod.azurecr.io/codesc:v$(Build.BuildId)   
+  displayName: 'Build and Deploy'
